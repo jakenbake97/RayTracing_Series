@@ -3,6 +3,7 @@
 #include "Sphere.h"
 #include "HitableList.h"
 #include <float.h>
+#include "Camera.h"
 
 using namespace std;
 
@@ -23,28 +24,30 @@ int main() {
 	output.open("output.ppm");
 	int nx = 200;
 	int ny = 100;
+	int ns = 100;
 	output << "P3\n" << nx << " " << ny << "\n255\n";
-	Vec3 lowerLeftCorner(-2.0, -1.0, -1.0);
-	Vec3 horizontal(4.0, 0.0, 0.0);
-	Vec3 vertical(0.0, 2.0, 0.0);
-	Vec3 origin(0.0, 0.0, 0.0);
+
 	Hitable *list[2];
 	list[0] = new Sphere(Vec3(0, 0, -1), 0.5);
 	list[1] = new Sphere(Vec3(0, -100.5, -1), 100);
 	Hitable *world = new HitableList(list, 2);
+	Camera cam;
 
 	for (int i = ny - 1; i >= 0; i--) {
 		for (int j = 0; j < nx; j++) {
-			float u = float(j) / float(nx);
-			float v = float(i) / float(ny);
-			ray r(origin, lowerLeftCorner + u * horizontal + v * vertical);
-
-			Vec3 p = r.point_at_parameter(2.0);
-			Vec3 col = color(r, world);
-			int ir = int(255.99*col.r());
-			int ig = int(255.99*col.g());
-			int ib = int(255.99*col.b());
-
+			Vec3 col(0, 0, 0);
+			for (int k = 0; k < ns; k++)
+			{
+				float u = float(j + (rand() / (RAND_MAX + 1.0)))/ float(nx);
+				float v = float(i + (rand() / (RAND_MAX + 1.0)))/ float(ny);
+				ray r = cam.getRay(u, v);
+				Vec3 p = r.point_at_parameter(2.0);
+				col += color(r, world);
+			}
+			col /= float(ns);
+			int ir = int(255.99 * col[0]);
+			int ig = int(255.99 * col[1]);
+			int ib = int(255.99 * col[2]);
 			output << ir << " " << ig << " " << ib << "\n";
 		}
 	}
