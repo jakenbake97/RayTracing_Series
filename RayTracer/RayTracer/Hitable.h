@@ -1,20 +1,20 @@
 #pragma once
-#ifndef HITABLEH
-#define HITABLEH
+#ifndef HITABLE_H
+#define HITABLE_H
 
 #include "Ray.h"
 
 class Material;
 
-struct hitRecord {
+struct HitRecord {
 	float t;
 	Vec3 p;
 	Vec3 normal;
-	Material *matPtr;
+	Material* matPtr;
 };
 
 class Hitable {
 public:
-	virtual bool hit(const ray& r, float tMin, float tMax, hitRecord& rec) const = 0;
+	virtual bool Hit(const Ray& r, float tMin, float tMax, HitRecord& rec) const = 0;
 };
-#endif // !HITABLEH
+#endif // !HITABLE_H

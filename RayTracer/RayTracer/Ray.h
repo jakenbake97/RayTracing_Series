@@ -1,19 +1,20 @@
 #pragma once
-#ifndef RAYH
-#define RAYH
+#ifndef RAY_H
+#define RAY_H
 #include "Vec3.h"
 
-class ray 
+// A simple class for defining each ray that is projected from the camera
+class Ray 
 {
 public:
-	ray() {}
-	ray(const Vec3& a, const Vec3& b) { A = a; B = b; }
-	Vec3 origin() const { return A; }
-	Vec3 direction() const { return B; }
-	Vec3 point_at_parameter(float t) const { return A + t * B; }
+	Ray() = default;
+	Ray(const Vec3& a, const Vec3& b) { vecA = a; vecB = b; }
+	Vec3 Origin() const { return vecA; }
+	Vec3 Direction() const { return vecB; }
+	Vec3 PointAtParameter(const float t) const { return vecA + t * vecB; }
 
-	Vec3 A;
-	Vec3 B;
+	Vec3 vecA;
+	Vec3 vecB;
 };
-#endif // !RAYH
+#endif // !RAY_H
 

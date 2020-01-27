@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 
+// A simple way to time the duration it takes to render a single ppm frame
 class Timer
 {
 private:
