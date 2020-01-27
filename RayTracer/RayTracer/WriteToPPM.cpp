@@ -1,10 +1,13 @@
 #include <iostream>
 #include <fstream>
+#include <float.h>
+#include <string>
+
 #include "Sphere.h"
 #include "HitableList.h"
-#include <float.h>
 #include "Camera.h"
 #include "Material.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -61,12 +64,11 @@ Hitable *randomScene() {
 }
 
 int main() {
-	ofstream output;
-	output.open("output.ppm");
-	int nx = 1200;
-	int ny = 800;
-	int ns = 50;
-	output << "P3\n" << nx << " " << ny << "\n255\n";
+	
+	int nx = 1280;
+	int ny = 720;
+	int ns = 64;
+	
 
 
 	Hitable *list[5];
@@ -78,34 +80,44 @@ int main() {
 	list[4] = new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectric(1.5));
 	Hitable *world = new HitableList(list, 5);
 	world = randomScene();
+
+
+	const Vec3 lookAt(0, 0, 0);
+	const float distToFocus = 10.0;
+	const float aperture = 0.1;
+	const float radian = 7.5f * 0.0174532925;
 	
-	Vec3 lookFrom(13, 2, 3);
-	Vec3 lookAt(0, 0, 0);
-	float distToFocus = 10.0;
-	float aperture = 0.1;
+	ofstream output;
+	for (int orbit = 0; orbit < 48; orbit++)
+	{
+		Timer timer;
+		const Vec3 lookFrom(13.0f * cos(radian * float(orbit)), 2.0f, 13.0f * sin(radian * float(orbit)));
+		string fileName = "output" + std::to_string(orbit) + ".ppm";
+		output.open(fileName);
+		output << "P3\n" << nx << " " << ny << "\n255\n";
+		Camera cam(lookFrom, lookAt, Vec3(0, 1, 0), 20, float(nx) / float(ny), aperture, distToFocus);
 
-	Camera cam(lookFrom, lookAt, Vec3(0, 1, 0), 20, float(nx) / float(ny), aperture, distToFocus);
-
-	for (int i = ny - 1; i >= 0; i--) {
-		for (int j = 0; j < nx; j++) {
-			Vec3 col(0, 0, 0);
-			for (int k = 0; k < ns; k++)
-			{
-				float u = float(j + (rand() / (RAND_MAX + 1.0)))/ float(nx);
-				float v = float(i + (rand() / (RAND_MAX + 1.0)))/ float(ny);
-				ray r = cam.getRay(u, v);
-				Vec3 p = r.point_at_parameter(2.0);
-				col += color(r, world, 0);
+		for (int i = ny - 1; i >= 0; i--) {
+			for (int j = 0; j < nx; j++) {
+				Vec3 col(0, 0, 0);
+				for (int k = 0; k < ns; k++)
+				{
+					float u = float(j + (rand() / (RAND_MAX + 1.0))) / float(nx);
+					float v = float(i + (rand() / (RAND_MAX + 1.0))) / float(ny);
+					ray r = cam.getRay(u, v);
+					Vec3 p = r.point_at_parameter(2.0);
+					col += color(r, world, 0);
+				}
+				col /= float(ns);
+				col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
+				int ir = int(255.99 * col[0]);
+				int ig = int(255.99 * col[1]);
+				int ib = int(255.99 * col[2]);
+				output << ir << " " << ig << " " << ib << "\n";
 			}
-			col /= float(ns);
-			col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-			int ir = int(255.99 * col[0]);
-			int ig = int(255.99 * col[1]);
-			int ib = int(255.99 * col[2]);
-			output << ir << " " << ig << " " << ib << "\n";
-			cout << "X: " << j << " Y: " << i << "\n";
 		}
+		cout << "File: " << orbit << "complete in " << timer.GetDuration() << "\n";
+		output.close();
 	}
-	output.close();
 	return 0;
 }
