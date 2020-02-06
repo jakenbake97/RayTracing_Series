@@ -15,7 +15,10 @@ inline Vec3 RandomInUnitDisk() {
 
 class Camera {
 public:
-	Camera(const Vec3 lookFrom, const Vec3 lookAt, const Vec3 vUp, const float vFov, const float aspect, const float aperture, const float focusDist) { // vFov is top to bottom in degrees
+	Camera(const Vec3 lookFrom, const Vec3 lookAt, const Vec3 vUp, const float vFov, const float aspect, const float aperture, const float focusDist, float t0, float t1)
+	{ // vFov is top to bottom in degrees
+		time0 = t0;
+		time1 = t1;
 		lensRadius = aperture / 2;
 		const float theta = vFov * M_PI / 180;
 		const float halfHeight = tan(theta / 2);
@@ -32,7 +35,8 @@ public:
 	{
 		const Vec3 rd = lensRadius * RandomInUnitDisk();
 		const Vec3 offset = u * rd.X() + v * rd.Y();
-		return Ray{ origin + offset, lowerLeftCorner + s * horizontal + t * vertical - origin - offset };
+		float time = time0 + (rand() / (RAND_MAX + 1.0)) * (time1 - time0);
+		return Ray{ origin + offset, lowerLeftCorner + s * horizontal + t * vertical - origin - offset, time };
 	}
 
 	Vec3 origin;
@@ -40,6 +44,7 @@ public:
 	Vec3 horizontal;
 	Vec3 vertical;
 	Vec3 u, v, w;
+	float time0, time1;
 	float lensRadius;
 };
 

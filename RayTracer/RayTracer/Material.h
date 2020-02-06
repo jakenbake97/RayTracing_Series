@@ -50,7 +50,7 @@ public:
 	bool Scatter(const Ray& rIn, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const override
 	{
 		Vec3 target = rec.p + rec.normal + RandomInUnitSphere();
-		scattered = Ray(rec.p, target - rec.p);
+		scattered = Ray(rec.p, target - rec.p, rIn.Time());
 		attenuation = albedo;
 		return true;
 	}
