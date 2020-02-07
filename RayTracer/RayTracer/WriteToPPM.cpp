@@ -8,13 +8,9 @@
 #include "Camera.h"
 #include "Material.h"
 #include "Timer.h"
+#include "Random.h"
 
 using namespace std;
-
-double DRand()
-{
-	return rand() / (RAND_MAX + 1.0);
-}
 
 Vec3 Color(const Ray& r, Hitable* world, const int depth) {
 	HitRecord rec;
