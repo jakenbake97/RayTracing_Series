@@ -65,6 +65,17 @@ Hitable* RandomScene() {
 	return new HitableList(list, i);
 }
 
+Hitable* TwoSpheres()
+{
+	Texture* checker = new CheckerTexture( new ConstantTexture(Vec3(0.2, 0.3, 0.1)), new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
+	int n = 50;
+	Hitable** list = new Hitable*[n+1];
+	list[0] = new Sphere(Vec3(0, -10, 0), 10, new Lambertian(checker));
+	list[1] = new Sphere(Vec3(0, 10, 0), 10, new Lambertian(checker));
+
+	return new HitableList(list, 2);
+}
+
 int main() {
 
 	int nx = 853;
@@ -79,16 +90,14 @@ int main() {
 	list[3] = new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectric(1.5));
 	list[4] = new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectric(1.5));
 	Hitable* world = new HitableList(list, 5);
-	world = RandomScene();
+	world = TwoSpheres();
 
 	const Vec3 lookAt(0, 0, 0);
+	const Vec3 lookFrom(13.0f, 2.0f, 3.0f);
 	const float distToFocus = 10.0;
 	const float aperture = 0.0;
-	const float radian = 7.5f * 0.0174532925;
 
 	ofstream output;
-	Timer timer;
-	const Vec3 lookFrom(13.0f, 2.0f, 13.0f);
 	string fileName = "output.ppm";
 	output.open(fileName);
 	output << "P3\n" << nx << " " << ny << "\n255\n";
@@ -113,7 +122,6 @@ int main() {
 			output << ir << " " << ig << " " << ib << "\n";
 		}
 	}
-	cout << "File: complete in " << timer.GetDuration() << "\n";
 	output.close();
 	return 0;
 }
