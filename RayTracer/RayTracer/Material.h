@@ -4,6 +4,7 @@
 
 #include "Ray.h"
 #include "Hitable.h"
+#include "Texture.h"
 
 Vec3 RandomInUnitSphere() {
 	Vec3 p;
@@ -45,17 +46,17 @@ float Schlick(const float cosine, const float refIdx) {
 // Controls the appearance of diffuse objects using the lambertian lighting model
 class Lambertian : public Material {
 public:
-	Lambertian(const Vec3& a) : albedo(a) {}
+	Lambertian(Texture* a) : albedo(a) {}
 
-	bool Scatter(const Ray& rIn, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const override
+	virtual bool Scatter(const Ray& rIn, const HitRecord& rec, Vec3& attenuation, Ray& scattered) const
 	{
 		Vec3 target = rec.p + rec.normal + RandomInUnitSphere();
-		scattered = Ray(rec.p, target - rec.p, rIn.Time());
-		attenuation = albedo;
+		scattered = Ray(rec.p, target - rec.p);
+		attenuation = albedo->Value(0, 0, rec.p);
 		return true;
 	}
 
-	Vec3 albedo;
+	Texture* albedo;
 };
 
 // Controls the appearance of reflective objects

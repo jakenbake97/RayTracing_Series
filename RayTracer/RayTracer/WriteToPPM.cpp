@@ -34,7 +34,8 @@ Vec3 Color(const Ray& r, Hitable* world, const int depth) {
 Hitable* RandomScene() {
 	const int n = 50000;
 	const auto list = new Hitable * [n + 1];
-	list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(Vec3(0.5, 0.5, 0.5)));
+	Texture* checker = new CheckerTexture(new ConstantTexture(Vec3(0.2, 0.3, 0.1)), new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
+	list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(checker));
 	int i = 1;
 	for (int a = -10; a < 10; a++) {
 		for (int b = -10; b < 10; b++) {
@@ -42,8 +43,8 @@ Hitable* RandomScene() {
 			Vec3 center(a + 0.9 * DRand(), 0.2, b + 0.9 * DRand());
 			if ((center - Vec3(4, 0.2, 0)).Length() > 0.9) {
 				if (chooseMat < 0.8) { // diffuse
-					list[i++] = new MovingSphere(center, center + Vec3(0, 0.5 * DRand(), 0), 0.0, 1.0, 0.2, 
-						new Lambertian(Vec3(DRand() * DRand(),DRand() * DRand(), DRand() * DRand())));
+					list[i++] = new MovingSphere(center, center + Vec3(0, 0.5 * DRand(), 0), 0.0, 1.0, 0.2,
+						new Lambertian(new ConstantTexture(Vec3(DRand() * DRand(), DRand() * DRand(), DRand() * DRand()))));
 				}
 				else if (chooseMat < 0.95) { // metal
 					list[i++] = new Sphere(center, 0.2,
@@ -58,7 +59,7 @@ Hitable* RandomScene() {
 	}
 
 	list[i++] = new Sphere(Vec3(0, 1, 0), 1.0, new Dielectric(1.5));
-	list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new Lambertian(Vec3(0.4, 0.2, 0.1)));
+	list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new Lambertian(new ConstantTexture(Vec3(0.4, 0.2, 0.1))));
 	list[i++] = new Sphere(Vec3(4, 1, 0), 1.0, new Metal(Vec3(0.7, 0.6, 0.5), 0.0));
 
 	return new HitableList(list, i);
@@ -72,8 +73,8 @@ int main() {
 
 	Hitable* list[5];
 	float R = cos(M_PI / 4);
-	list[0] = new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)));
-	list[1] = new Sphere(Vec3(0, -100.5, -1), 100, new Lambertian(Vec3(0.8, 0.8, 0.0)));
+	list[0] = new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))));
+	list[1] = new Sphere(Vec3(0, -100.5, -1), 100, new Lambertian(new ConstantTexture(Vec3(0.8, 0.8, 0.0))));
 	list[2] = new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.0));
 	list[3] = new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectric(1.5));
 	list[4] = new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectric(1.5));
