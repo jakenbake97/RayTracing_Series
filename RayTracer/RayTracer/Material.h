@@ -52,7 +52,7 @@ public:
 	{
 		Vec3 target = rec.p + rec.normal + RandomInUnitSphere();
 		scattered = Ray(rec.p, target - rec.p);
-		attenuation = albedo->Value(0, 0, rec.p);
+		attenuation = albedo->Value(rec.u, rec.v, rec.p);
 		return true;
 	}
 

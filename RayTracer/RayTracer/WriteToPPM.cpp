@@ -9,6 +9,11 @@
 #include "Material.h"
 #include "Timer.h"
 #include "Random.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#include "ImageTexture.h"
 
 using namespace std;
 
@@ -26,7 +31,7 @@ Vec3 Color(const Ray& r, Hitable* world, const int depth) {
 	}
 	else {
 		const Vec3 unitDirection = UnitVector(r.Direction());
-		const float t = 0.5 * (unitDirection.Y() + 1.0);
+		const float t = (0.5 * unitDirection.Y() + 1.0);
 		return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
 	}
 }
@@ -80,9 +85,19 @@ Hitable* TwoPerlinSpheres()
 {
 	Texture* pertext = new NoiseTexture(1.0f);
 	Hitable** list = new Hitable*[2];
+	int nx, ny, nn;
+	unsigned char* texData = stbi_load("Earth.jpg", &nx, &ny, &nn, 0);
 	list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(pertext));
-	list[1] = new Sphere(Vec3(0, 2, 0), 2, new Lambertian(pertext));
+	list[1] = new Sphere(Vec3(0, 2, 0), 2, new Lambertian(new ImageTexture(texData, nx, ny)));
 	return new HitableList(list, 2);
+}
+
+Hitable* Earth()
+{
+	int nx, ny, nn;
+	unsigned char* texData = stbi_load("Earth.jpg", &nx, &ny, &nn, 0);
+	Material* mat = new Lambertian(new ImageTexture(texData, nx, ny));
+	return new Sphere(Vec3(0,0,0), 2, mat);
 }
 
 int main() {
@@ -91,7 +106,7 @@ int main() {
 	int ny = 480;
 	int ns = 32;
 
-	Hitable* world = TwoPerlinSpheres();
+	Hitable* world = Earth();
 
 	const Vec3 lookAt(0, 0, 0);
 	const Vec3 lookFrom(13.0f, 2.0f, 3.0f);

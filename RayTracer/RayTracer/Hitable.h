@@ -8,8 +8,18 @@
 
 class Material;
 
+void GetSphereUV(const Vec3& p, float& u, float& v)
+{
+	float phi = atan2(p.Z(), p.X());
+	float theta = asin(p.Y());
+	u = 1 - (phi + M_PI) / (2 * M_PI);
+	v = (theta + M_PI / 2) / M_PI;
+}
+
 struct HitRecord {
 	float t;
+	float u;
+	float v;
 	Vec3 p;
 	Vec3 normal;
 	Material* matPtr;

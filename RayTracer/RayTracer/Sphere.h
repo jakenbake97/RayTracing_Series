@@ -18,16 +18,17 @@ public:
 
 // Check to see if the sphere was hit
 bool Sphere::Hit(const Ray& r, const float tMin, const float tMax, HitRecord& rec) const {
-	const Vec3 oc = r.Origin() - center;
-	const float a = Dot(r.Direction(), r.Direction());
-	const float b = Dot(oc, r.Direction());
-	const float c = Dot(oc, oc) - radius * radius;
-	const float discriminant = b * b - a * c;
+	Vec3 oc = r.Origin() - center;
+	float a = Dot(r.Direction(), r.Direction());
+	float b = Dot(oc, r.Direction());
+	float c = Dot(oc, oc) - radius * radius;
+	float discriminant = b * b - a * c;
 	if (discriminant > 0) {
 		float temp = (-b - sqrt(b * b - a * c)) / a;
 		if (temp < tMax && temp > tMin) {
 			rec.t = temp;
 			rec.p = r.PointAtParameter(rec.t);
+			GetSphereUV((rec.p - center)/radius, rec.u, rec.v);
 			rec.normal = (rec.p - center) / radius;
 			rec.matPtr = matPtr;
 			return true;
@@ -37,6 +38,7 @@ bool Sphere::Hit(const Ray& r, const float tMin, const float tMax, HitRecord& re
 		{
 			rec.t = temp;
 			rec.p = r.PointAtParameter(rec.t);
+			GetSphereUV((rec.p - center)/radius, rec.u, rec.v);
 			rec.normal = (rec.p - center) / radius;
 			rec.matPtr = matPtr;
 			return true;
@@ -51,10 +53,12 @@ bool Sphere::BoundingBox(float t0, float t1, AABB& box) const
 	return true;
 }
 
-class MovingSphere: public Hitable
+
+
+class MovingSphere : public Hitable
 {
 public:
-	MovingSphere(){}
+	MovingSphere() {}
 	MovingSphere(Vec3 cen0, Vec3 cen1, float t0, float t1, float r, Material* m)
 		: center0(cen0), center1(cen1), time0(t0), time1(t1), radius(r), matPtr(m) {};
 	virtual bool Hit(const Ray& r, float tmin, float tmax, HitRecord& rec) const;
@@ -101,9 +105,11 @@ bool MovingSphere::Hit(const Ray& r, const float tMin, const float tMax, HitReco
 
 bool MovingSphere::BoundingBox(float t0, float t1, AABB& box) const
 {
-        AABB box0(Center(t0) - Vec3(radius, radius, radius), Center(t0) + Vec3(radius, radius, radius));
-        AABB box1(Center(t1) - Vec3(radius, radius, radius), Center(t1) + Vec3(radius, radius, radius));
-        box = SurroundingBox(box0, box1);
-        return true;
+	AABB box0(Center(t0) - Vec3(radius, radius, radius), Center(t0) + Vec3(radius, radius, radius));
+	AABB box1(Center(t1) - Vec3(radius, radius, radius), Center(t1) + Vec3(radius, radius, radius));
+	box = SurroundingBox(box0, box1);
+	return true;
 }
+
+
 #endif // !SPHERE_H
